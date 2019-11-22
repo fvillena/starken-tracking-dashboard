@@ -82,6 +82,6 @@ if ($err) {
 $data_url = json_decode($response, true)["url"];
 
 $csv = file_get_contents($data_url);
-$csv = iconv(mb_detect_encoding($csv, mb_detect_order(), true), "UTF-8", $csv);
+$csv = mb_convert_encoding($csv,"ISO-8859-1","UTF-8");
 echo csvToJson($csv);
 ?>
