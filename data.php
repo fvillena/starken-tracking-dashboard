@@ -8,14 +8,15 @@ $orders = json_decode(file_get_contents("orders.json"),true);
 $data = array();
 $shipping_numbers = array();
 foreach ($orders as $order) {
-  $shipping_numbers[$order["shipping_number"]] = $order["id"];
+  $shipping_numbers[$order["shipping_number"]] = $order;
 }
 
 $unbinded_shipments = array();
 
 foreach ($shipments as $shipment) {
   if (array_key_exists($shipment['orden'],$shipping_numbers)) {
-    $id = $shipping_numbers[$shipment['orden']];
+    $id = $shipping_numbers[$shipment['orden']]["id"];
+    $current_state = $shipping_numbers[$shipment['orden']]["current_state"];
   } else {
     $id = "";
     if ($shipment["estado"] != "ANULADO") {
@@ -29,7 +30,8 @@ foreach ($shipments as $shipment) {
     "destinatario" => $shipment['destinatario'],
     "estado" => $shipment['estado'],
     "id" => $id,
-    "destino" => $shipment["destino"]
+    "current_state" => $current_state,
+    "destino" => $shipment["destino"],
   );
 };
 

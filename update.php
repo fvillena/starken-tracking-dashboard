@@ -43,10 +43,27 @@ function update_tracking_number($id,$tracking_number)
     $xml = $webService->edit($opt);
 }
 
+function mark_as_delivered($id)
+{
+    $webService = new PrestaShopWebservice(PS_SHOP_PATH, PS_WS_AUTH_KEY, DEBUG);
+    $xml = $webService->get(array('resource' => 'orders', 'id' => $id));
+    $xml->order->current_state = 5;
+    $opt['putXml'] = $xml->asXML();
+    $opt['id'] = $id;
+    $opt['resource'] = 'orders';
+    $xml = $webService->edit($opt);
+}
+
 $data = json_decode(file_get_contents("data.json"),true);
 
 foreach ($data["binded_pairs"] as $key => $pair) {
     update_tracking_number($pair["id"],$pair["shipping_number"]);
+}
+
+foreach ($data["data"] as $key => $order) {
+    if (($order["current_state"] == "4")&&($order["id"] != "")&&($order["estado"] == "ENTREGADO")) {
+        mark_as_delivered($order["id"]);
+    };
 }
 
 ?>

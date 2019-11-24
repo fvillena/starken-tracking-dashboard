@@ -49,7 +49,7 @@ foreach ($states as $key => $state) {
 
 // Here we set the option array for the Webservice : we want customers resources
 $opt['resource'] = 'orders';
-$opt['display'] = '[id,id_customer,shipping_number,id_address_delivery,reference,date_add]';
+$opt['display'] = '[id,id_customer,shipping_number,id_address_delivery,reference,date_add,current_state]';
 $opt['limit'] = 50;
 $opt['sort'] = '[id_DESC]';
 
