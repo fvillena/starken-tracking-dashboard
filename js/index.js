@@ -5,7 +5,8 @@ $(document).ready(function() {
             { "data": "emision" },
             { "data": "orden" },
             { "data": "destinatario" },
-            { "data": "estado" }
+            { "data": "estado" },
+            { "data": "id" }
         ],
         "paging":false,
         "aaSorting": [0, 'desc'],

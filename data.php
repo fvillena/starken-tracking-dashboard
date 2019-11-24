@@ -1,87 +1,107 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-include 'config.php';
 header('Content-Type: application/json');
-function csvToJson($csv) {
-    $rows = explode("\n", trim($csv));
-    $data = array_slice($rows, 1);
-    $keys = array_fill(0, count($data), $rows[0]);
-    $json = array_map(function ($row, $key) {
-        $row = str_getcsv($row,$delimiter=";");
-        $key = str_getcsv($key,$delimiter=";");
-        if (count($row) == count($key)) {
-            return array_combine($key,$row);
-        } else {
-            $key_count = count($key);
-            return array_combine($key,array_slice($row,0,$key_count));
+
+
+$shipments = json_decode(file_get_contents("shipments.json"),true);
+$orders = json_decode(file_get_contents("orders.json"),true);
+
+$data = array();
+$shipping_numbers = array();
+foreach ($orders as $order) {
+  $shipping_numbers[$order["shipping_number"]] = $order["id"];
+}
+
+$unbinded_shipments = array();
+
+foreach ($shipments as $shipment) {
+  if (array_key_exists($shipment['orden'],$shipping_numbers)) {
+    $id = $shipping_numbers[$shipment['orden']];
+  } else {
+    $id = "";
+    if ($shipment["estado"] != "ANULADO") {
+      $unbinded_shipments[] = $shipment;
+    }
+    
+  }
+  $data[] = array(
+    "orden" => $shipment['orden'],
+    "emision" => $shipment['emision'],
+    "destinatario" => $shipment['destinatario'],
+    "estado" => $shipment['estado'],
+    "id" => $id,
+    "destino" => $shipment["destino"]
+  );
+};
+
+$binded_pairs = array();
+foreach ($unbinded_shipments as $key => $unbinded_shipment) {
+  $candidates = array();
+  foreach ($orders as $key => $order) {
+    if ($order["shipping_number"] == "") {
+      $candidates[] = $order;
+    }
+  }
+  $shipping_number = $unbinded_shipment["orden"];
+  $shipping_created = $unbinded_shipment["emision"];
+  $shipping_created = strtotime($shipping_created);
+  $shipping_state = $unbinded_shipment["destino"];
+  $shipping_state = strtolower($shipping_state);
+  $shipping_fullname = $unbinded_shipment["destinatario"];
+  $shipping_firstname = strtolower(explode(" ", $shipping_fullname)[0]);
+  $estado = $unbinded_shipment["estado"];
+  if ($estado != "ANULADO") {
+    $current_candidates = array();
+    foreach ($candidates as $key => $candidate) {
+      $candidate_created = strtotime("-1 day", strtotime($candidate["date_add"]));
+      if (($candidate_created <= $shipping_created)&&($candidate_created >= (strtotime("-7 day", $shipping_created)))) {
+        $current_candidates[] = $candidate;
+      }
+    }
+    $candidates = $current_candidates;
+    if (count($candidates) > 1) {
+      $current_candidates = array();
+      foreach ($candidates as $key => $candidate) {
+        $candidate_state = strtolower($candidate["address"]["state"]);
+        $candidate_state = str_replace('á', 'a', $candidate_state);
+        $candidate_state = str_replace('é', 'e', $candidate_state);
+        $candidate_state = str_replace('í', 'i', $candidate_state);
+        $candidate_state = str_replace('ó', 'o', $candidate_state);
+        $candidate_state = str_replace('ú', 'u', $candidate_state);
+        $candidate_state = str_replace('Ñ', 'n', $candidate_state);
+        $candidate_state = str_replace('ñ', 'n', $candidate_state);
+        if ($candidate_state == $shipping_state) {
+          $current_candidates[] = $candidate;
         }
-    }, $data, $keys);
-    return json_encode(array("data" => $json));
+      }
+    $candidates = $current_candidates;
+    if (count($candidates) > 1) {
+      // echo "ambiguous";
+    } elseif (count($candidates) == 0) {
+      // echo "not found";
+      // var_dump($unbinded_shipment);
+    } else {
+      $binded_pairs[] = array("id" => $candidates[0]["id"],"shipping_number"=>$unbinded_shipment["orden"]);
+    }
+    } elseif (count($candidates) == 0) {
+      // echo "not found";
+    } else {
+      $binded_pairs[] = array("id" => $candidates[0]["id"],"shipping_number"=>$unbinded_shipment["orden"]);
+    }
+  }
 }
 
-$curl = curl_init();
+$fp = fopen('data.json', 'w');
+fwrite($fp, json_encode(array(
+  "data"=>$data,
+  "unbinded_shipments" => $unbinded_shipments,
+  "binded_pairs" => $binded_pairs,
+), JSON_PRETTY_PRINT));
+fclose($fp);
 
-curl_setopt_array($curl, array(
-  CURLOPT_URL => "https://mypartner.mystarken.cl/webCtaCte/scripts/control.php",
-  CURLOPT_RETURNTRANSFER => 1,
-  CURLOPT_VERBOSE => 1,
-  CURLOPT_HEADER => 1,
-  CURLOPT_CUSTOMREQUEST => "POST",
-  CURLOPT_POSTFIELDS => "user=".$user."&pass=".$password,
-  CURLOPT_HTTPHEADER => array(
-    "X-Requested-With: XMLHttpRequest",
-  ),
-));
+echo json_encode(array(
+  "data"=>$data,
+  "unbinded_shipments" => $unbinded_shipments,
+  "binded_pairs" => $binded_pairs,
+), JSON_PRETTY_PRINT);
 
-$response = curl_exec($curl);
-$err = curl_error($curl);
-
-curl_close($curl);
-
-if ($err) {
-  echo "cURL Error #:" . $err;
-} else {
-}
-
-preg_match_all('/^Set-Cookie:\s*([^;]*)/mi', $response, $matches);
-$cookies = array();
-foreach($matches[1] as $item) {
-    parse_str($item, $cookie);
-    $cookies = array_merge($cookies, $cookie);
-}
-
-$PHPSESSID =  $cookies["PHPSESSID"];
-
-$date_start = date("Y-m-d", strtotime("-1 months"));
-$date_end = date("Y-m-d");
-
-$curl = curl_init();
-
-curl_setopt_array($curl, array(
-  CURLOPT_URL => "https://mypartner.mystarken.cl/webCtaCte/panel/informes/get_informe.php",
-  CURLOPT_RETURNTRANSFER => 1,
-  CURLOPT_CUSTOMREQUEST => "POST",
-  CURLOPT_POSTFIELDS => "fecha_emi_ini=".$date_start."&fecha_emi_fin=".$date_end."&fecha_compro_ini=-1&fecha_compro_fin=-1&fecha_ent_ini=-1&fecha_ent_fin=-1&swDctos=0&t_ent=-1&t_pago=-1&t_servicio=-1&bultos=0,300&kgs=0,500&origins=-1&destinations=-1&estados=-1",
-  CURLOPT_HTTPHEADER => array(
-    "Cookie: PHPSESSID=".$PHPSESSID,
-    "X-Requested-With: XMLHttpRequest",
-  ),
-));
-
-$response = curl_exec($curl);
-$err = curl_error($curl);
-curl_close($curl);
-
-if ($err) {
-  echo "cURL Error #:" . $err;
-} else {
-}
-
-$data_url = json_decode($response, true)["url"];
-
-$csv = file_get_contents($data_url);
-$csv = mb_convert_encoding($csv,"ISO-8859-1","UTF-8");
-echo csvToJson($csv);
 ?>
