@@ -1,7 +1,54 @@
+function format ( d ) {
+    // `d` is the original data object for the row
+    return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">'+
+        '<tr>'+
+            '<td>Destino:</td>'+
+            '<td>'+d.destino+'</td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>Compromiso:</td>'+
+            '<td>'+d.compromiso+'</td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>Valor:</td>'+
+            '<td>'+d.valor_of+'</td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>Tipo de Pago:</td>'+
+            '<td>'+d.tipo_pago+'</td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>Tipo de Entrega:</td>'+
+            '<td>'+d.tipo_entrega+'</td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>Dirección:</td>'+
+            '<td>'+d.direccion+'</td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>Fecha de Entrega:</td>'+
+            '<td>'+d.fecha_entrega+'</td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>Recibido por::</td>'+
+            '<td>'+d.recibe+'</td>'+
+        '</tr>'+
+        '<tr>'+
+            '<td>RUT del Receptor:</td>'+
+            '<td>'+d.rut_recibe+'</td>'+
+        '</tr>'+
+    '</table>';
+}
 $(document).ready(function() {
     var table = $('#results').DataTable( {
         "ajax": "data.php",
         "columns": [
+            {
+                "className":      'details-control',
+                "orderable":      false,
+                "data":           null,
+                "defaultContent": '+'
+            },
             { "data": "emision" },
             { "data": "orden",
             fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
@@ -16,7 +63,22 @@ $(document).ready(function() {
             } }
         ],
         "paging":false,
-        "aaSorting": [0, 'desc'],
+        "aaSorting": [1, 'desc'],
+    } );
+    $('#results tbody').on('click', 'td.details-control', function () {
+        var tr = $(this).closest('tr');
+        var row = table.row( tr );
+ 
+        if ( row.child.isShown() ) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        }
+        else {
+            // Open this row
+            row.child( format(row.data()) ).show();
+            tr.addClass('shown');
+        }
     } );
     setInterval( function () {
         table.ajax.reload();

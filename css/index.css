@@ -2,12 +2,6 @@
 .table-responsive {
 	display: table;
 }
-#loading {
-	text-align: center;
-    width: 100%;
-    position:fixed;
-    top: 50%;
-    background-color: #EEE;
-    font-size: 20px;
-	z-index: 999;
+td.details-control {
+    cursor: pointer;
 }
