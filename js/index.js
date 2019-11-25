@@ -1,5 +1,5 @@
 $(document).ready(function() {
-    $('#results').DataTable( {
+    var table = $('#results').DataTable( {
         "ajax": "data.php",
         "columns": [
             { "data": "emision" },
@@ -18,4 +18,7 @@ $(document).ready(function() {
         "paging":false,
         "aaSorting": [0, 'desc'],
     } );
+    setInterval( function () {
+        table.ajax.reload();
+    }, 600000 );
 } );
