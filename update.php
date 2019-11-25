@@ -37,6 +37,7 @@ function update_tracking_number($id,$tracking_number)
     $webService = new PrestaShopWebservice(PS_SHOP_PATH, PS_WS_AUTH_KEY, DEBUG);
     $xml = $webService->get(array('resource' => 'orders', 'id' => $id));
     $xml->order->shipping_number = $tracking_number;
+    $xml->order->current_state = 4;
     $opt['putXml'] = $xml->asXML();
     $opt['id'] = $id;
     $opt['resource'] = 'orders';
