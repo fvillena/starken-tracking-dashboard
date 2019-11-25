@@ -60,7 +60,8 @@ $(document).ready(function() {
             { "data": "id",
             fnCreatedCell: function (nTd, sData, oData, iRow, iCol) {
                 $(nTd).html("<a target=_blank href='https://dentonet.cl/admin-1470710090/index.php?controller=AdminOrders&vieworder&id_order="+oData.id+"'>"+oData.id+"</a>");
-            } }
+            } },
+            { "data": "reference" },
         ],
         "paging":false,
         "aaSorting": [1, 'desc'],

@@ -19,6 +19,7 @@ foreach ($shipments as $shipment)
     {
         $id = $shipping_numbers[$shipment['orden']]["id"];
         $current_state = $shipping_numbers[$shipment['orden']]["current_state"];
+        $reference = $shipping_numbers[$shipment['orden']]["reference"];
     }
     else
     {
@@ -45,6 +46,7 @@ foreach ($shipments as $shipment)
         "id" => $id,
         "current_state" => $current_state,
         "destino" => $shipment["destino"],
+        "reference" => $reference,
     );
 };
 
