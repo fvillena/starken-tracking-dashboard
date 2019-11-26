@@ -65,6 +65,17 @@ $(document).ready(function() {
         ],
         "paging":false,
         "aaSorting": [1, 'desc'],
+        "createdRow": function( row, data, dataIndex){
+            if( data["estado"] ==  "ANULADO"){
+                $(row).addClass('table-danger');
+            }
+            if( data["estado"] ==  "ENTREGADO"){
+                $(row).addClass('table-success');
+            }
+            else {
+                $(row).addClass('table-warning');
+            }
+        }
     } );
     $('#results tbody').on('click', 'td.details-control', function () {
         var tr = $(this).closest('tr');
