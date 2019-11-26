@@ -73,7 +73,7 @@ $(document).ready(function() {
                 $(row).addClass('table-success');
             }
             else {
-                $(row).addClass('table-warning');
+                $(row).addClass('table-info');
             }
         }
     } );
