@@ -1,8 +1,11 @@
 <?php
 $dir = dirname(__FILE__);
-echo $dir;
-exec("php ".$dir."/shipments.php");
-exec("php ".$dir."/orders.php");
-exec("php ".$dir."/data.php");
-exec("php ".$dir."/update.php");
+exec("php ".$dir."/shipments.php 2>&1" , $output);
+var_dump($output);
+exec("php ".$dir."/orders.php 2>&1" , $output);
+var_dump($output);
+exec("php ".$dir."/data.php 2>&1" , $output);
+var_dump($output);
+exec("php ".$dir."/update.php 2>&1" , $output);
+var_dump($output);
 ?>
