@@ -31,6 +31,7 @@ header('Content-Type: application/json;charset=utf-8');
 include 'config.php';
 
 require_once(dirname(__FILE__).'/PSWebServiceLibrary.php');
+openlog("starken-tracking-dashboard", LOG_PID | LOG_PERROR, LOG_LOCAL0);
 
 $webService = new PrestaShopWebservice(PS_SHOP_PATH, PS_WS_AUTH_KEY, DEBUG);
 
@@ -73,6 +74,7 @@ foreach ($orders as $key => &$order) {
 	}
 	}
 unset($order);
+syslog(LOG_INFO, "number of orders: ".count($orders));
 $orders = json_encode($orders, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
 $fp = fopen(dirname(__FILE__).'/orders.json', 'w');

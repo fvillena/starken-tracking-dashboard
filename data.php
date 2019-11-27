@@ -1,5 +1,6 @@
 <?php
 header('Content-Type: application/json');
+openlog("starken-tracking-dashboard", LOG_PID | LOG_PERROR, LOG_LOCAL0);
 
 $shipments = json_decode(file_get_contents(dirname(__FILE__)."/shipments.json") , true);
 $orders = json_decode(file_get_contents(dirname(__FILE__)."/orders.json") , true);
@@ -134,6 +135,9 @@ foreach ($unbinded_shipments as $key => $unbinded_shipment)
         }
     }
 }
+
+syslog(LOG_INFO,"number of unbinded shipments: ".count($unbinded_shipments));
+syslog(LOG_INFO,"number of binding candidates: ".count($binded_pairs));
 
 $fp = fopen(dirname(__FILE__).'/data.json', 'w');
 fwrite($fp, json_encode(array(

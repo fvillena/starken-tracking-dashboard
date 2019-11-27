@@ -28,7 +28,7 @@
 
 // Here we define constants /!\ You need to replace this parameters
 include dirname(__FILE__).'/config.php';
-
+openlog("starken-tracking-dashboard", LOG_PID | LOG_PERROR, LOG_LOCAL0);
 require_once(dirname(__FILE__).'/PSWebServiceLibrary.php');
 
 
@@ -59,11 +59,13 @@ $data = json_decode(file_get_contents(dirname(__FILE__)."/data.json"),true);
 
 foreach ($data["binded_pairs"] as $key => $pair) {
     update_tracking_number($pair["id"],$pair["shipping_number"]);
+    syslog(LOG_INFO, "updating order ".$pair["id"]." with shipping number ".$pair["shipping_number"]);
 }
 
 foreach ($data["data"] as $key => $order) {
     if (($order["current_state"] == "4")&&($order["id"] != "")&&($order["estado"] == "ENTREGADO")) {
         mark_as_delivered($order["id"]);
+        syslog(LOG_INFO, "order ".$order["id"]." marked as delivered");
     };
 }
 

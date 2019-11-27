@@ -4,6 +4,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 include 'config.php';
 header('Content-Type: application/json');
+openlog("starken-tracking-dashboard", LOG_PID | LOG_PERROR, LOG_LOCAL0);
 function csvToJson($csv) {
     $rows = explode("\n", trim($csv));
     $data = array_slice($rows, 1);
@@ -18,6 +19,7 @@ function csvToJson($csv) {
             return array_combine($key,array_slice($row,0,$key_count));
         }
     }, $data, $keys);
+    syslog(LOG_INFO, "number of shipments: ".count($json));
     return json_encode($json,JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 }
 
