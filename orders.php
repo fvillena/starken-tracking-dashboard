@@ -30,7 +30,7 @@
 header('Content-Type: application/json;charset=utf-8');
 include 'config.php';
 
-require_once('PSWebServiceLibrary.php');
+require_once(dirname(__FILE__).'/PSWebServiceLibrary.php');
 
 $webService = new PrestaShopWebservice(PS_SHOP_PATH, PS_WS_AUTH_KEY, DEBUG);
 
@@ -75,7 +75,7 @@ foreach ($orders as $key => &$order) {
 unset($order);
 $orders = json_encode($orders, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 
-$fp = fopen('orders.json', 'w');
+$fp = fopen(dirname(__FILE__).'/orders.json', 'w');
 fwrite($fp, $orders);
 fclose($fp);
 

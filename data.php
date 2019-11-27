@@ -1,8 +1,8 @@
 <?php
 header('Content-Type: application/json');
 
-$shipments = json_decode(file_get_contents("shipments.json") , true);
-$orders = json_decode(file_get_contents("orders.json") , true);
+$shipments = json_decode(file_get_contents(dirname(__FILE__)."/shipments.json") , true);
+$orders = json_decode(file_get_contents(dirname(__FILE__)."/orders.json") , true);
 
 $data = array();
 $shipping_numbers = array();
@@ -135,7 +135,7 @@ foreach ($unbinded_shipments as $key => $unbinded_shipment)
     }
 }
 
-$fp = fopen('data.json', 'w');
+$fp = fopen(dirname(__FILE__).'/data.json', 'w');
 fwrite($fp, json_encode(array(
     "data" => $data,
     "unbinded_shipments" => $unbinded_shipments,

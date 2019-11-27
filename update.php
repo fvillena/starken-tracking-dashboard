@@ -27,9 +27,9 @@
 */
 
 // Here we define constants /!\ You need to replace this parameters
-include 'config.php';
+include dirname(__FILE__).'/config.php';
 
-require_once('./PSWebServiceLibrary.php');
+require_once(dirname(__FILE__).'/PSWebServiceLibrary.php');
 
 
 function update_tracking_number($id,$tracking_number)
@@ -55,7 +55,7 @@ function mark_as_delivered($id)
     $xml = $webService->edit($opt);
 }
 
-$data = json_decode(file_get_contents("data.json"),true);
+$data = json_decode(file_get_contents(dirname(__FILE__)."/data.json"),true);
 
 foreach ($data["binded_pairs"] as $key => $pair) {
     update_tracking_number($pair["id"],$pair["shipping_number"]);

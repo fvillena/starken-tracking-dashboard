@@ -85,7 +85,7 @@ $csv = file_get_contents($data_url);
 $csv = mb_convert_encoding($csv,"ISO-8859-1","UTF-8");
 $shipments = csvToJson($csv);
 
-$fp = fopen('shipments.json', 'w');
+$fp = fopen(dirname(__FILE__).'/shipments.json', 'w');
 fwrite($fp, $shipments);
 fclose($fp);
 
