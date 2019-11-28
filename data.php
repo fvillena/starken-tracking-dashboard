@@ -69,7 +69,7 @@ foreach ($unbinded_shipments as $key => $unbinded_shipment)
     $shipping_state = $unbinded_shipment["destino"];
     $shipping_state = strtolower($shipping_state);
     $shipping_fullname = $unbinded_shipment["destinatario"];
-    $shipping_firstname = strtolower(explode(" ", $shipping_fullname) [0]);
+    $shipping_firstname = strtolower(explode(" ", $shipping_fullname)[0]);
     $estado = $unbinded_shipment["estado"];
     if ($estado != "ANULADO")
     {
@@ -83,6 +83,7 @@ foreach ($unbinded_shipments as $key => $unbinded_shipment)
             }
         }
         $candidates = $current_candidates;
+        $candidates_raw = $candidates;
         if ((count($candidates) > 1)||(count($candidates) < count($unbinded_shipments) ))
         {
             $current_candidates = array();
@@ -104,13 +105,70 @@ foreach ($unbinded_shipments as $key => $unbinded_shipment)
             $candidates = $current_candidates;
             if (count($candidates) > 1)
             {
-                // echo "ambiguous";
+                $current_candidates = array();
+                foreach ($candidates as $key => $candidate)
+                {
+                    $candidate_firstname = strtolower($candidate["address"]["firstname"]);
+                    $candidate_firstname = explode(" ", $candidate_firstname)[0];
+                    $candidate_firstname = str_replace('á', 'a', $candidate_firstname);
+                    $candidate_firstname = str_replace('é', 'e', $candidate_firstname);
+                    $candidate_firstname = str_replace('í', 'i', $candidate_firstname);
+                    $candidate_firstname = str_replace('ó', 'o', $candidate_firstname);
+                    $candidate_firstname = str_replace('ú', 'u', $candidate_firstname);
+                    $candidate_firstname = str_replace('Ñ', 'n', $candidate_firstname);
+                    $candidate_firstname = str_replace('ñ', 'n', $candidate_firstname);
+                    if ($candidate_firstname == $shipping_firstname)
+                    {
+                        $current_candidates[] = $candidate;
+                    }
+                }
+                $candidates = $current_candidates;
+                if (count($candidates) > 1)
+                {
+                    // echo "ambiguous";
+                    
+                } elseif (count($candidates) == 0) {
+                    // echo "not found";
+                } else {
+                    $binded_pairs[] = array(
+                        "id" => $candidates[0]["id"],
+                        "shipping_number" => $unbinded_shipment["orden"]
+                    );
+                }
                 
             }
             elseif (count($candidates) == 0)
             {
-                // echo "not found";
-                // var_dump($unbinded_shipment);
+                $current_candidates = array();
+                foreach ($candidates_raw as $key => $candidate)
+                {
+                    $candidate_firstname = strtolower($candidate["address"]["firstname"]);
+                    $candidate_firstname = explode(" ", $candidate_firstname)[0];
+                    $candidate_firstname = str_replace('á', 'a', $candidate_firstname);
+                    $candidate_firstname = str_replace('é', 'e', $candidate_firstname);
+                    $candidate_firstname = str_replace('í', 'i', $candidate_firstname);
+                    $candidate_firstname = str_replace('ó', 'o', $candidate_firstname);
+                    $candidate_firstname = str_replace('ú', 'u', $candidate_firstname);
+                    $candidate_firstname = str_replace('Ñ', 'n', $candidate_firstname);
+                    $candidate_firstname = str_replace('ñ', 'n', $candidate_firstname);
+                    if ($candidate_firstname == $shipping_firstname)
+                    {
+                        $current_candidates[] = $candidate;
+                    }
+                }
+                $candidates = $current_candidates;
+                if (count($candidates) > 1)
+                {
+                    // echo "ambiguous";
+                    
+                } elseif (count($candidates) == 0) {
+                    // echo "not found";
+                } else {
+                    $binded_pairs[] = array(
+                        "id" => $candidates[0]["id"],
+                        "shipping_number" => $unbinded_shipment["orden"]
+                    );
+                }
                 
             }
             else
