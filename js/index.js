@@ -69,6 +69,9 @@ $(document).ready(function() {
             if( data["estado"] ==  "ANULADO"){
                 $(row).addClass('table-danger');
             }
+            if( data["tipo_pago"] ==  "POR PAGAR"){
+                $(row).addClass('table-warning');
+            }
             if( data["estado"] ==  "ENTREGADO"){
                 $(row).addClass('table-success');
             }
