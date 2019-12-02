@@ -84,7 +84,7 @@ foreach ($unbinded_shipments as $key => $unbinded_shipment)
         }
         $candidates = $current_candidates;
         $candidates_raw = $candidates;
-        if ((count($candidates) > 1)||(count($candidates) < count($unbinded_shipments) ))
+        if ((count($candidates) >= 1)||(count($candidates) < count($unbinded_shipments) ))
         {
             $current_candidates = array();
             foreach ($candidates as $key => $candidate)
@@ -179,17 +179,9 @@ foreach ($unbinded_shipments as $key => $unbinded_shipment)
                 );
             }
         }
-        elseif (count($candidates) == 0)
-        {
+        else {
             // echo "not found";
             
-        }
-        else
-        {
-            $binded_pairs[] = array(
-                "id" => $candidates[0]["id"],
-                "shipping_number" => $unbinded_shipment["orden"]
-            );
         }
     }
 }
