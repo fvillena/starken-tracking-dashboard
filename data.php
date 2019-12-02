@@ -26,7 +26,7 @@ foreach ($shipments as $shipment)
     {
         $id = "";
         $reference = "";
-        if ($shipment["estado"] != "ANULADO")
+        if (($shipment["estado"] != "ANULADO")&&($shipment["tipo_pago"] != "POR PAGAR"))
         {
             $unbinded_shipments[] = $shipment;
         }
