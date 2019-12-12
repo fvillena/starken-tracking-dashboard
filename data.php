@@ -58,7 +58,7 @@ foreach ($unbinded_shipments as $key => $unbinded_shipment)
     $candidates = array();
     foreach ($orders as $key => $order)
     {
-        if ((($order["shipping_number"] == "") || ($order["shipping_number"] == " "))&&($order["current_state"] != "6"))
+        if ((($order["shipping_number"] == "") || ($order["shipping_number"] == " "))&&(($order["current_state"] != "6")||($order["current_state"] != "8")))
         {
             $candidates[] = $order;
         }
